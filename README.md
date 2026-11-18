@@ -34,55 +34,28 @@ python -m unittest -v
 ## Usage
 
 ```python
-from hopfield import HopfieldNetwork, Pattern, AsynchronousUpdate
-
-square = Pattern.from_grid("""
-    # # # # #
-    # . . . #
-    # . . . #
-    # . . . #
-    # # # # #
-""")
+from hopfield import HopfieldNetwork
 
 network = HopfieldNetwork(size=25, alpha=0.2, theta=1.75)
-network.train(square)               # several patterns: network.train(a, b, c)
-network.alpha = 0.3                 # alpha and theta are settable properties
-recalled = network.recall(partial)  # returns the stable state as a Pattern
-
-# Asynchronous updating instead of the default synchronous rule:
-network = HopfieldNetwork(size=25, update_strategy=AsynchronousUpdate())
+network.train(pattern_a, pattern_b)   # patterns are lists of 25 values that are 0 or 1
+network.theta = 2.0                   # alpha and theta are settable properties
+recalled = network.recall(partial)    # returns the stable state as a list of 0/1 values
 ```
 
 ## Design
 
-`hopfield.py` contains the following classes:
+`hopfield.py` contains two classes:
 
 | Class | Responsibility |
 |-------|----------------|
-| `Neuron` | Tracks its connections (weights), learns from the presented pattern, updates its own state. |
-| `HopfieldNetwork` | Presents patterns to its neurons, starts updating and stops once a stable state is reached. Holds the settable properties `alpha` and `theta`. |
-| `SynchronousUpdate`, `AsynchronousUpdate` | Decide the order in which neurons update (all at once, or one at a time in random order). |
-| `Pattern` | Immutable 0/1 pattern; conversion from/to a text grid. |
-| `HasState`, `Presentable`, `Learner`, `Updatable`, `UpdateStrategy` | Small protocols describing what the parts expect from each other. |
+| `Neuron` | Tracks its connections (weights) to the other neurons, learns from the presented pattern and computes its next state. |
+| `HopfieldNetwork` | Creates and connects the neurons, presents patterns to them, updates them synchronously and stops once a stable state is reached. Holds the settable properties `alpha` and `theta`. |
 
 Learning rule (applied by every neuron to each of its connections):
 
 - `w_ij := α + (1 − α) · w_ij` if neurons *i* and *j* are both on or both off;
 - `w_ij := (1 − α) · w_ij` otherwise; `w_ii = 0` (no self-connections).
 
-Update rule: neuron *i* is on in the next state when `Σ_{j ∈ S_n} w_ij ≥ θ`.
-Updating stops as soon as a step changes nothing (`S_n = S_{n+1}`); if that does
-not happen within `max_steps` steps a `NotStableError` is raised.
-
-OOP choices:
-
-- **Encapsulation** – state and weights are private; the network exposes the
-  state only as an immutable `Pattern`, and its neurons as a tuple that is never
-  handed out.
-- **Open/closed & dependency inversion** – the network depends on the
-  `UpdateStrategy` protocol, so a new update rule can be added without changing
-  `HopfieldNetwork`.
-- **Interface segregation** – update strategies only need the `Updatable`
-  protocol, not the learning part of a neuron.
-- **Defensive input handling** – `alpha`, `theta`, sizes and patterns are
-  validated; a batch of training patterns is validated before any learning starts.
+Update rule (synchronous): neuron *i* is on in the next state when `Σ_{j ∈ S_n} w_ij ≥ θ`.
+Updating stops as soon as `S_n = S_{n+1}`; if that does not happen within
+`max_steps` steps a `RuntimeError` is raised.
