@@ -3,6 +3,8 @@
 An object oriented implementation of a Hopfield network, including a demo that
 recovers learned patterns in a network of 25 neurons (a 5x5 grid).
 
+All code is in a single file, `hopfield.py`; the unit tests are in `test_hopfield.py`.
+
 ## Requirements
 
 - Python 3.10 or newer
@@ -17,7 +19,7 @@ cd oop
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt  # installs nothing, kept for completeness
-python demo.py
+python hopfield.py
 ```
 
 Run the unit tests with:
@@ -50,13 +52,15 @@ network = HopfieldNetwork(size=25, update_strategy=AsynchronousUpdate())
 
 ## Design
 
-| File | Class | Responsibility |
-|------|-------|----------------|
-| `hopfield/neuron.py` | `Neuron` | Tracks its connections (weights), learns from the presented pattern, updates its own state. |
-| `hopfield/network.py` | `HopfieldNetwork` | Presents patterns to its neurons, starts updating and stops once a stable state is reached. Holds the settable properties `alpha` and `theta`. |
-| `hopfield/update_strategies.py` | `SynchronousUpdate`, `AsynchronousUpdate` | Decide the order in which neurons update (all at once, or one at a time in random order). |
-| `hopfield/pattern.py` | `Pattern` | Immutable 0/1 pattern; conversion from/to a text grid. |
-| `hopfield/protocols.py` | `HasState`, `Presentable`, `Learner`, `Updatable`, `UpdateStrategy` | Small protocols describing what the parts expect from each other. |
+`hopfield.py` contains the following classes:
+
+| Class | Responsibility |
+|-------|----------------|
+| `Neuron` | Tracks its connections (weights), learns from the presented pattern, updates its own state. |
+| `HopfieldNetwork` | Presents patterns to its neurons, starts updating and stops once a stable state is reached. Holds the settable properties `alpha` and `theta`. |
+| `SynchronousUpdate`, `AsynchronousUpdate` | Decide the order in which neurons update (all at once, or one at a time in random order). |
+| `Pattern` | Immutable 0/1 pattern; conversion from/to a text grid. |
+| `HasState`, `Presentable`, `Learner`, `Updatable`, `UpdateStrategy` | Small protocols describing what the parts expect from each other. |
 
 Learning rule (applied by every neuron to each of its connections):
 

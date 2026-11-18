@@ -1,4 +1,4 @@
-"""Unit tests for the Hopfield network. Run with ``python -m unittest`` from the project directory."""
+"""Unit tests for the Hopfield network. Run with ``python -m unittest``."""
 
 from __future__ import annotations
 
