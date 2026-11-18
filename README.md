@@ -16,11 +16,14 @@ All code is in a single file, `hopfield.py`; the unit tests are in `test_hopfiel
 ```bash
 git clone https://github.com/bellagpt/oop.git
 cd oop
-python -m venv .venv
+python3 -m venv .venv            # Windows: py -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt  # installs nothing, kept for completeness
-python hopfield.py
+python hopfield.py               # inside the venv, `python` points to Python 3
 ```
+
+Without a venv, run `python3 hopfield.py` (Linux/macOS) or `py hopfield.py` (Windows).
+On Debian/Ubuntu, `python3 -m venv` may require `sudo apt install python3-venv` first.
 
 Run the unit tests with:
 
