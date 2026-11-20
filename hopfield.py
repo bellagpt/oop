@@ -212,7 +212,7 @@ class Demo(Protocol):
     THETA: float
     GRID_WIDTH: int
     PATTERNS: list[Pattern]
-    TEST_CASES: list[tuple[str, Pattern, Pattern]]  # (description, damaged input, expected output)
+    TEST_CASES: list[tuple[Pattern, Pattern]]  # (damaged input, expected output)
 
 
 def to_rows(pattern: Pattern, width: int) -> list[str]:
@@ -232,9 +232,9 @@ def run_demo(demo: Demo, update_rule: UpdateRule) -> None:
     network.train(demo.PATTERNS)
     print(f"=== {type(update_rule).__name__} (alpha={network.alpha}, theta={network.theta}) ===\n")
 
-    for description, damaged, expected in demo.TEST_CASES:
+    for number, (damaged, expected) in enumerate(demo.TEST_CASES, start=1):
         recalled = network.recall(damaged)
-        print(description + ":", "recovered" if recalled == expected else "NOT recovered")
+        print(f"Test {number}:", "recovered" if recalled == expected else "NOT recovered")
         column_width = demo.GRID_WIDTH * 2 + 3
         print("input".ljust(column_width) + "output".ljust(column_width) + "expected")
         grids = [to_rows(pattern, demo.GRID_WIDTH) for pattern in (damaged, recalled, expected)]

@@ -27,7 +27,8 @@ python hopfield.py               # inside the venv, `python` points to Python 3
 The demo runs twice: once with synchronous and once with asynchronous updating.
 
 To run a different demo, create e.g. `my_demo.py` that defines what the `Demo` protocol
-asks for (`ALPHA`, `THETA`, `GRID_WIDTH`, `PATTERNS` and `TEST_CASES`) and run
+asks for (`ALPHA`, `THETA`, `GRID_WIDTH`, `PATTERNS` and `TEST_CASES`, a list of
+`(damaged input, expected pattern)` pairs) and run
 `python hopfield.py my_demo`.
 
 Without a venv, run `python3 hopfield.py` (Linux/macOS) or `py hopfield.py` (Windows).

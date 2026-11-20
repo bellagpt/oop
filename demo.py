@@ -31,30 +31,30 @@ BAR = [
 # The patterns the network learns
 PATTERNS = [SQUARE, BAR]
 
-# (description, damaged input, pattern that should come out)
+# (damaged input, pattern that should come out)
 TEST_CASES = [
-    ("Square with half of the border missing", [
+    ([
         1, 1, 1, 0, 0,
         1, 0, 0, 0, 0,
         1, 0, 0, 0, 0,
         1, 0, 0, 0, 0,
         1, 1, 1, 1, 1,
     ], SQUARE),
-    ("Square with three flipped neurons", [
+    ([
         1, 1, 1, 1, 1,
         1, 0, 1, 0, 1,
         1, 0, 0, 0, 0,
         1, 0, 0, 0, 1,
         1, 1, 1, 0, 1,
     ], SQUARE),
-    ("Bar with its bottom row missing", [
+    ([
         0, 0, 0, 0, 0,
         1, 1, 1, 1, 1,
         1, 1, 1, 1, 1,
         0, 0, 0, 0, 0,
         0, 0, 0, 0, 0,
     ], BAR),
-    ("Bar with holes and noise", [
+    ([
         0, 1, 0, 0, 0,
         1, 0, 1, 1, 1,
         1, 1, 0, 1, 1,
