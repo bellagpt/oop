@@ -12,8 +12,8 @@ recovers learned patterns in a network of 25 neurons (a 5x5 grid).
 ## Requirements
 
 - Python 3.10 or newer
-- No external dependencies: only the Python standard library is used
-  (`requirements.txt` is therefore empty).
+- No external dependencies: only the Python standard library is used,
+  so there is nothing to install.
 
 ## Running the code in a venv
 
@@ -22,7 +22,6 @@ git clone https://github.com/bellagpt/oop.git
 cd oop
 python3 -m venv .venv            # Windows: py -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt  # installs nothing, kept for completeness
 python hopfield.py               # inside the venv, `python` points to Python 3
 ```
 
