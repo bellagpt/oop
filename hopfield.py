@@ -215,12 +215,11 @@ class Demo(Protocol):
     TEST_CASES: list[tuple[str, Pattern, Pattern]]  # (description, damaged input, expected output)
 
 
-def to_grid(pattern: Pattern, width: int) -> list[str]:
+def to_rows(pattern: Pattern, width: int) -> list[str]:
     """
-    :return: The pattern as rows of '#' (on) and '.' (off)
+    :return: The pattern as rows of 0s and 1s, so its shape is easy to see
     """
-    symbols = ["#" if value else "." for value in pattern]
-    return [" ".join(symbols[i:i + width]) for i in range(0, len(symbols), width)]
+    return [" ".join(str(value) for value in pattern[i:i + width]) for i in range(0, len(pattern), width)]
 
 
 def run_demo(demo: Demo, update_rule: UpdateRule) -> None:
@@ -238,7 +237,7 @@ def run_demo(demo: Demo, update_rule: UpdateRule) -> None:
         print(description + ":", "recovered" if recalled == expected else "NOT recovered")
         column_width = demo.GRID_WIDTH * 2 + 3
         print("input".ljust(column_width) + "output".ljust(column_width) + "expected")
-        grids = [to_grid(pattern, demo.GRID_WIDTH) for pattern in (damaged, recalled, expected)]
+        grids = [to_rows(pattern, demo.GRID_WIDTH) for pattern in (damaged, recalled, expected)]
         for row in zip(*grids):
             print("    ".join(row))
         print()
