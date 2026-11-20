@@ -8,6 +8,11 @@ Run it with ``python3 hopfield.py``. Another demo case can be used instead with
 ``python3 hopfield.py --demo other_demo``, as long as it defines the same three names:
 GRID_WIDTH, PATTERNS and TEST_CASES.
 """
+"""
+File: hopfield.py
+Author: Isabella Ko (S6379338), Kaja Sledzinska (S6350992)
+Description: Hopfield network  
+"""
 
 GRID_WIDTH = 5  # Only used to print the patterns as a grid
 
