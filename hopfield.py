@@ -54,9 +54,9 @@ class Neuron:
 
     def update(self, theta: float) -> bool:
         """
-        Returns 
+        Calculates subsequent states (activation) according to updating formula 
+        Returns True when activation is >= theta, otherwise False
         :param theta: Threshold the activation must reach
-        :return: Whether this neuron should be on, based on the summed weight from active neurons
         """
         activation = sum(weight for other, weight in self._weights.items() if other.is_active)
         return activation >= theta
@@ -64,16 +64,14 @@ class Neuron:
 
 class HopfieldNetwork:
     """
-    A fully connected network of neurons that learns patterns and recalls them from partial input
+    The fully connected network of neurons that learns patterns and recalls them from partial input
     """
-    Pattern = list[int]  # One value per neuron: 1 (on) or 0 (off)
-    MAX_STEPS = 100
+    Pattern = list[int] 
+    MAX_STEPS = 100  # Prevents looping: if no stable state has been reached by 100 updates, it stops with an error.  
 
     def __init__(self, size: int, alpha: float, theta: float) -> None:
         """
         :param size: Number of neurons
-        :param alpha: Learning parameter between 0 and 1
-        :param theta: Threshold a neuron's activation must reach to turn on
         """
         self.alpha = alpha
         self.theta = theta
@@ -101,14 +99,14 @@ class HopfieldNetwork:
     @property
     def state(self) -> HopfieldNetwork.Pattern:
         """
-        The current state of the network as a new list, so it cannot change the neurons
+        Returns a list of current states off all neurons
         """
         return [int(neuron.is_active) for neuron in self._neurons]
 
     def train(self, patterns: list[HopfieldNetwork.Pattern]) -> None:
         """
-        Presents the patterns one by one and lets every neuron learn from each of them
-        :param patterns: Patterns to learn
+        Trains every neuron by presnting a pattern (for each pattern) 
+        :param patterns: List of patterns to learn
         """
         for pattern in patterns:
             self._present(pattern)
@@ -117,22 +115,21 @@ class HopfieldNetwork:
 
     def recall(self, pattern: HopfieldNetwork.Pattern) -> HopfieldNetwork.Pattern:
         """
-        Presents a (partial) pattern and updates the neurons until a stable state is reached
+        Presents a partial pattern (input) and updates the neurons until a stable state is reached.
+        That stable state is then returned
         :param pattern: Pattern to start from
-        :return: The stable state of the network
         """
         self._present(pattern)
         for _ in range(self.MAX_STEPS):
             if not self._update():
-                return self.state  # Nothing changed, so S_n == S_n+1
-        raise RuntimeError(f"No stable state reached within {self.MAX_STEPS} steps")
+                return self.state  
+        return None # no stable state was reached after MAX_STEPS iterations
 
     def _update(self) -> bool:
         """
-        Updates all neurons at the same time (synchronously)
-        :return: Whether any neuron changed its state
+        Updates all neurons at the same time (synchronously),
+        Returns True if the network changed, and False otherwise
         """
-        # Compute all new states first, so no neuron sees a partially updated network
         new_states = [neuron.update(self._theta) for neuron in self._neurons]
         changed = new_states != [neuron.is_active for neuron in self._neurons]
         for neuron, new_state in zip(self._neurons, new_states):
