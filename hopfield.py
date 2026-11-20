@@ -1,12 +1,11 @@
 """
-A Hopfield network in an object oriented way.
-
-Run ``python3 hopfield.py`` to train the network on the demo case in demo.py and recall its patterns.
-Use ``python3 hopfield.py --help`` to see how to set alpha, theta or another demo case.
+File: hopfield.py
+Author: Isabella Ko (S6379338), Kaja Sledzinska (S6350992)
+Description: Hopfield network implemented in an object oriented way.
+With settable parameters --alpha and --theta.
 """
 
 from __future__ import annotations
-
 import argparse
 import importlib
 
