@@ -185,8 +185,6 @@ def main() -> None:
 
     network = HopfieldNetwork(len(demo.PATTERNS[0]), args.alpha, args.theta)
     network.train(demo.PATTERNS)
-    print(f"Trained on {len(demo.PATTERNS)} patterns from {args.demo}.py "
-          f"(alpha={network.alpha}, theta={network.theta})\n")
 
     width = demo.GRID_WIDTH
     for number, (damaged, expected) in enumerate(demo.TEST_CASES, start=1):
