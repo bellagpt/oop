@@ -7,7 +7,6 @@ recovers learned patterns in a network of 25 neurons (a 5x5 grid).
 |------|----------|
 | `hopfield.py` | The network (`Neuron`, `HopfieldNetwork`) and a generic `run_demo` that runs any demo |
 | `demo.py` | The demo data: two 5x5 patterns, damaged versions of them, and the values of α and θ |
-| `test_hopfield.py` | Unit tests |
 
 ## Requirements
 
@@ -31,12 +30,6 @@ and run `python hopfield.py my_demo`.
 
 Without a venv, run `python3 hopfield.py` (Linux/macOS) or `py hopfield.py` (Windows).
 On Debian/Ubuntu, `python3 -m venv` may require `sudo apt install python3-venv` first.
-
-Run the unit tests with:
-
-```bash
-python -m unittest -v
-```
 
 ## Usage
 
