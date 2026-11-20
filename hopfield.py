@@ -158,10 +158,6 @@ class HopfieldNetwork:
 
 
 def main() -> None:
-    """
-    Parses the command line arguments, trains a network on the demo case's patterns
-    and tries to recover them from the demo case's damaged inputs
-    """
     parser = argparse.ArgumentParser() # makes alpha and theta adjustable from command line
     parser.add_argument("--alpha", type=float, default=0.2)
     parser.add_argument("--theta", type=float, default=1.75)
