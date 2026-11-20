@@ -12,24 +12,24 @@ import importlib
 
 class Neuron:
     """
-    A neuron that tracks its connections to other neurons, learns from patterns and updates
+    One neuron in the network. It tracks its connections to other neurons, learns from patterns and updates
     """
 
     def __init__(self) -> None:
         self._active = False
-        self._weights: dict[Neuron, float] = {}  # Connected neuron -> weight w_ij
+        self._weights: dict[Neuron, float] = {}  # weights between self and other neurons (w_ij)
 
     @property
     def is_active(self) -> bool:
         """
-        Whether this neuron is currently on
+        Check if a neuron is on (return True when it's on, return False otherwise)
         """
         return self._active
 
     def connect_to(self, other: Neuron) -> None:
         """
-        Connects this neuron to another neuron with weight 0
-        :param other: Neuron to connect to, which cannot be this neuron itself
+        Connects this neuron to another neuron (initial weigth = 0)
+        :param other: Neuron to connect to (cannot be the neuron itself)
         """
         if other is self:
             raise ValueError("A neuron cannot be connected to itself")
