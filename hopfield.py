@@ -183,10 +183,8 @@ def main() -> None:
             result = "pattern recovered successfully" if recalled == expected else "pattern NOT recovered"
             print(f"Test {number}: {result}")
             print("input".ljust(width * 2 + 3) + "output")
-            # Print the input and output next to each other, one row of the grid at a time
             for start in range(0, len(damaged), width):
-                print("    ".join(" ".join(map(str, pattern[start:start + width]))
-                                 for pattern in (damaged, recalled)))
+                print("    ".join(" ".join(map(str, pattern[start:start + width])) for pattern in (damaged, recalled)))
             print()
 
 
