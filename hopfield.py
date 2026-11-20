@@ -1,11 +1,11 @@
 """
 File: hopfield.py
 Author: Isabella Ko (S6379338), Kaja Sledzinska (S6350992)
-Description: Hopfield network  
+Description: Hopfield network implemented in an object oriented way.
+With settable parameters --alpha and --theta.
 """
 
 from __future__ import annotations
-
 import argparse
 import importlib
 
