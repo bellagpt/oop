@@ -4,13 +4,12 @@ Demo for the Hopfield network: two patterns on a 5x5 grid (25 neurons) and damag
 A pattern assigns the value 1 (on) or 0 (off) to every neuron. The lists below are
 written as 5 rows of 5 values only to make the shapes easy to see.
 
-Run it with ``python3 hopfield.py``. Another demo can be used instead,
-as long as it defines the same names (see the Demo protocol in hopfield.py).
+Run it with ``python3 hopfield.py``. Another demo case can be used instead with
+``python3 hopfield.py --demo other_demo``, as long as it defines the same three names:
+GRID_WIDTH, PATTERNS and TEST_CASES.
 """
 
-ALPHA = 0.2
-THETA = 1.75
-GRID_WIDTH = 5
+GRID_WIDTH = 5  # Only used to print the patterns as a grid
 
 SQUARE = [
     1, 1, 1, 1, 1,

@@ -5,8 +5,8 @@ recovers learned patterns in a network of 25 neurons (a 5x5 grid).
 
 | File | Contents |
 |------|----------|
-| `hopfield.py` | The network (`Neuron`, `HopfieldNetwork`) and a generic `run_demo` that runs any demo |
-| `demo.py` | The demo data: two 5x5 patterns, damaged versions of them, and the values of α and θ |
+| `hopfield.py` | The network (`Neuron`, `HopfieldNetwork`) and a `main()` that reads the command line and runs a demo case |
+| `demo.py` | The demo case: two 5x5 patterns and damaged versions of them |
 
 ## Requirements
 
@@ -24,10 +24,22 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 python hopfield.py               # inside the venv, `python` points to Python 3
 ```
 
-To run a different demo, create e.g. `my_demo.py` that defines what the `Demo` protocol
-asks for (`ALPHA`, `THETA`, `GRID_WIDTH`, `PATTERNS` and `TEST_CASES`, a list of
-`(damaged input, expected pattern)` pairs) and run
-`python hopfield.py my_demo`.
+## Command line arguments
+
+| Argument | Default | Meaning |
+|----------|---------|---------|
+| `--alpha` | `0.2` | Learning parameter between 0 and 1 |
+| `--theta` | `1.75` | Threshold a neuron's activation must reach |
+| `--demo` | `demo` | Demo case to run: name of a `.py` file, without `.py` |
+
+```bash
+python hopfield.py --alpha 0.3 --theta 2.0
+python hopfield.py --help
+```
+
+To run a different demo case, create e.g. `my_demo.py` that defines `GRID_WIDTH`, `PATTERNS`
+(the patterns to learn) and `TEST_CASES` (a list of `(damaged input, expected pattern)` pairs),
+and run `python hopfield.py --demo my_demo`.
 
 Without a venv, run `python3 hopfield.py` (Linux/macOS) or `py hopfield.py` (Windows).
 On Debian/Ubuntu, `python3 -m venv` may require `sudo apt install python3-venv` first.
@@ -45,11 +57,10 @@ recalled = network.recall(partial)     # returns the stable state as a list of 0
 
 ## Design
 
-| Name in `hopfield.py` | Responsibility |
+| Class in `hopfield.py` | Responsibility |
 |-------|----------------|
 | `Neuron` | Tracks its connections (weights) to the other neurons, learns from the presented pattern and computes its own next state. |
 | `HopfieldNetwork` | Creates and connects the neurons, presents patterns to them, updates them synchronously and stops once a stable state is reached. Holds the settable properties `alpha` and `theta`. |
-| `Demo` (protocol) | What a demo module such as `demo.py` must define to be run by `run_demo`. |
 
 Learning rule (applied by every neuron to each of its connections):
 

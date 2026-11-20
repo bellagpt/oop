@@ -1,15 +1,14 @@
 """
 A Hopfield network in an object oriented way.
 
-Run ``python3 hopfield.py`` to run the demo in demo.py,
-or ``python3 hopfield.py other_demo`` to run another demo (see the Demo protocol).
+Run ``python3 hopfield.py`` to train the network on the demo case in demo.py and recall its patterns.
+Use ``python3 hopfield.py --help`` to see how to set alpha, theta or another demo case.
 """
 
 from __future__ import annotations
 
+import argparse
 import importlib
-import sys
-from typing import Protocol
 
 Pattern = list[int]  # One value per neuron: 1 (on) or 0 (off)
 
@@ -164,44 +163,46 @@ class HopfieldNetwork:
         return len(self._neurons)
 
 
-class Demo(Protocol):
+def main() -> None:
     """
-    What a demo (such as demo.py) must define to be run by run_demo
+    Parses the command line arguments, trains a network on the demo case's patterns
+    and tries to recover them from the demo case's damaged inputs
     """
-    ALPHA: float
-    THETA: float
-    GRID_WIDTH: int
-    PATTERNS: list[Pattern]
-    TEST_CASES: list[tuple[Pattern, Pattern]]  # (damaged input, expected output)
+    parser = argparse.ArgumentParser(
+        description="Train a Hopfield network on a demo case and recall its patterns.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument("--alpha", type=float, default=0.2, help="Learning parameter between 0 and 1")
+    parser.add_argument("--theta", type=float, default=1.75, help="Threshold a neuron's activation must reach")
+    parser.add_argument("--demo", default="demo", help="Demo case to run: name of a .py file, without .py")
+    args = parser.parse_args()
+    if not 0 <= args.alpha <= 1:
+        parser.error("--alpha must be between 0 and 1")
+    try:
+        demo = importlib.import_module(args.demo)
+    except ModuleNotFoundError:
+        parser.error(f"demo case '{args.demo}.py' not found")
 
-
-def to_rows(pattern: Pattern, width: int) -> list[str]:
-    """
-    :return: The pattern as rows of 0s and 1s, so its shape is easy to see
-    """
-    return [" ".join(str(value) for value in pattern[i:i + width]) for i in range(0, len(pattern), width)]
-
-
-def run_demo(demo: Demo) -> None:
-    """
-    Trains a network on the demo's patterns and tries to recover them from the damaged inputs
-    :param demo: Demo to run
-    """
-    network = HopfieldNetwork(len(demo.PATTERNS[0]), demo.ALPHA, demo.THETA)
+    network = HopfieldNetwork(len(demo.PATTERNS[0]), args.alpha, args.theta)
     network.train(demo.PATTERNS)
-    print(f"Trained on {len(demo.PATTERNS)} patterns (alpha={network.alpha}, theta={network.theta})\n")
+    print(f"Trained on {len(demo.PATTERNS)} patterns from {args.demo}.py "
+          f"(alpha={network.alpha}, theta={network.theta})\n")
 
+    width = demo.GRID_WIDTH
     for number, (damaged, expected) in enumerate(demo.TEST_CASES, start=1):
-        recalled = network.recall(damaged)
+        try:
+            recalled = network.recall(damaged)
+        except RuntimeError as error:
+            print(f"Test {number}: {error}\n")
+            continue
         print(f"Test {number}:", "recovered" if recalled == expected else "NOT recovered")
-        column_width = demo.GRID_WIDTH * 2 + 3
-        print("input".ljust(column_width) + "output".ljust(column_width) + "expected")
-        grids = [to_rows(pattern, demo.GRID_WIDTH) for pattern in (damaged, recalled, expected)]
-        for row in zip(*grids):
-            print("    ".join(row))
+        print("input".ljust(width * 2 + 3) + "output".ljust(width * 2 + 3) + "expected")
+        # Print the three patterns next to each other, one row of the grid at a time
+        for start in range(0, len(damaged), width):
+            print("    ".join(" ".join(map(str, pattern[start:start + width]))
+                             for pattern in (damaged, recalled, expected)))
         print()
 
 
 if __name__ == "__main__":
-    demo = importlib.import_module(sys.argv[1] if len(sys.argv) > 1 else "demo")
-    run_demo(demo)
+    main()
