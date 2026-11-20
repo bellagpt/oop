@@ -147,8 +147,8 @@ class HopfieldNetwork:
 
     def _present(self, pattern: HopfieldNetwork.Pattern) -> None:
          """
-        Sets every neuron to its value in the pattern: 1 is on, 0 is off
-        :param pattern: Pattern to present, with one value per neuron
+        Sets every neuron's state based on the presented pattern (1 is on, 0 is off)
+        :param pattern: The presented pattern
         """
         for i in range(len(self._neurons)):
             self._neurons[i].set_state(pattern[i] == 1)
@@ -162,21 +162,15 @@ def main() -> None:
     Parses the command line arguments, trains a network on the demo case's patterns
     and tries to recover them from the demo case's damaged inputs
     """
-    parser = argparse.ArgumentParser(
-        description="Train a Hopfield network on a demo case and recall its patterns.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-    parser.add_argument("--alpha", type=float, default=0.2, help="Learning parameter between 0 and 1")
-    parser.add_argument("--theta", type=float, default=1.75, help="Threshold a neuron's activation must reach")
-    parser.add_argument("--demo", default="demo", help="Demo case to run: name of a .py file, without .py")
+    parser = argparse.ArgumentParser() # makes alpha and theta adjustable from command line
+    parser.add_argument("--alpha", type=float, default=0.2)
+    parser.add_argument("--theta", type=float, default=1.75)
+    parser.add_argument("--demo", default="demo")
     args = parser.parse_args()
     if not 0 <= args.alpha <= 1:
-        parser.error("--alpha must be between 0 and 1")
-    try:
-        demo = importlib.import_module(args.demo)
-    except ModuleNotFoundError:
-        parser.error(f"demo case '{args.demo}.py' not found")
-
+        parser.error("--alpha must be between 0 and 1") # ensures alpha stays within its range
+        
+    demo = importlib.import_module(args.demo) 
     network = HopfieldNetwork(len(demo.PATTERNS[0]), args.alpha, args.theta)
     network.train(demo.PATTERNS)
 
