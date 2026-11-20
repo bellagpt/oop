@@ -146,12 +146,12 @@ class HopfieldNetwork:
                     neuron.connect_to(other)
 
     def _present(self, pattern: HopfieldNetwork.Pattern) -> None:
-         """
+        """
         Sets every neuron's state based on the presented pattern (1 is on, 0 is off)
         :param pattern: The presented pattern
         """
         for i in range(len(self._neurons)):
-            self._neurons[i].set_state(pattern[i] == 1)
+             self._neurons[i].set_state(pattern[i] == 1)
 
     def __len__(self) -> int:
         return len(self._neurons)
