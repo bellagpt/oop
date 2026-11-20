@@ -31,16 +31,8 @@ class Neuron:
         Connects this neuron to another neuron (initial weigth = 0)
         :param other: Neuron to connect to (cannot be the neuron itself)
         """
-        if other is self:
-            raise ValueError("A neuron cannot be connected to itself")
-        self._weights[other] = 0.0
-
-    def weight_to(self, other: Neuron) -> float:
-        """
-        :param other: Neuron at the other end of the connection
-        :return: Weight of the connection, which is 0 for the neuron itself (w_ii = 0)
-        """
-        return 0.0 if other is self else self._weights[other]
+        if other is not self:
+            self._weights[other] = 0.0
 
     def set_state(self, active: bool) -> None:
         """
@@ -51,16 +43,18 @@ class Neuron:
 
     def learn(self, alpha: float) -> None:
         """
-        Updates every connection weight to the current states of both neurons:
-        w := alpha + (1 - alpha) * w if both are on or both are off, otherwise w := (1 - alpha) * w
+        Updates every connection based on the learning rule 
+        (if both neurons in the connection have the same state: w := alpha + (1 - alpha) * w
+        otherwise: w := (1 - alpha) * w)
         :param alpha: Learning parameter between 0 and 1
         """
         for other, weight in self._weights.items():
             same_state = other.is_active == self._active
             self._weights[other] = (alpha if same_state else 0.0) + (1 - alpha) * weight
 
-    def next_state(self, theta: float) -> bool:
+    def update(self, theta: float) -> bool:
         """
+        Returns 
         :param theta: Threshold the activation must reach
         :return: Whether this neuron should be on, based on the summed weight from active neurons
         """
@@ -139,7 +133,7 @@ class HopfieldNetwork:
         :return: Whether any neuron changed its state
         """
         # Compute all new states first, so no neuron sees a partially updated network
-        new_states = [neuron.next_state(self._theta) for neuron in self._neurons]
+        new_states = [neuron.update(self._theta) for neuron in self._neurons]
         changed = new_states != [neuron.is_active for neuron in self._neurons]
         for neuron, new_state in zip(self._neurons, new_states):
             neuron.set_state(new_state)
