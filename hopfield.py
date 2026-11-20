@@ -146,10 +146,12 @@ class HopfieldNetwork:
                     neuron.connect_to(other)
 
     def _present(self, pattern: HopfieldNetwork.Pattern) -> None:
-        if len(pattern) != len(self):
-            raise ValueError(f"A pattern must have {len(self)} values")
-        for neuron, value in zip(self._neurons, pattern):
-            neuron.set_state(value == 1)
+         """
+        Sets every neuron to its value in the pattern: 1 is on, 0 is off
+        :param pattern: Pattern to present, with one value per neuron
+        """
+        for i in range(len(self._neurons)):
+            self._neurons[i].set_state(pattern[i] == 1)
 
     def __len__(self) -> int:
         return len(self._neurons)
