@@ -176,19 +176,18 @@ def main() -> None:
 
     width = demo.GRID_WIDTH
     for number, (damaged, expected) in enumerate(demo.TEST_CASES, start=1):
-        try:
-            recalled = network.recall(damaged)
-        except RuntimeError as error:
-            print(f"Test {number}: {error}\n")
-            continue
-        result = "pattern recovered successfully" if recalled == expected else "pattern NOT recovered"
-        print(f"Test {number}: {result}")
-        print("input".ljust(width * 2 + 3) + "output")
-        # Print the input and output next to each other, one row of the grid at a time
-        for start in range(0, len(damaged), width):
-            print("    ".join(" ".join(map(str, pattern[start:start + width]))
-                             for pattern in (damaged, recalled)))
-        print()
+        recalled = network.recall(damaged)
+        if recalled is None:
+            print(f"Test {number}: no stable state reached\n")
+        else:
+            result = "pattern recovered successfully" if recalled == expected else "pattern NOT recovered"
+            print(f"Test {number}: {result}")
+            print("input".ljust(width * 2 + 3) + "output")
+            # Print the input and output next to each other, one row of the grid at a time
+            for start in range(0, len(damaged), width):
+                print("    ".join(" ".join(map(str, pattern[start:start + width]))
+                                 for pattern in (damaged, recalled)))
+            print()
 
 
 if __name__ == "__main__":
