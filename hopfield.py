@@ -8,7 +8,6 @@ or ``python3 hopfield.py other_demo`` to run another demo (see the Demo protocol
 from __future__ import annotations
 
 import importlib
-import random
 import sys
 from typing import Protocol
 
@@ -72,55 +71,6 @@ class Neuron:
         activation = sum(weight for other, weight in self._weights.items() if other.is_active)
         return activation >= theta
 
-    def update(self, theta: float) -> bool:
-        """
-        Moves this neuron to its next state
-        :param theta: Threshold the activation must reach
-        :return: Whether the state of this neuron changed
-        """
-        new_state = self.next_state(theta)
-        changed = new_state != self._active
-        self._active = new_state
-        return changed
-
-
-class UpdateRule(Protocol):
-    def step(self, neurons: tuple[Neuron, ...], theta: float) -> bool:
-        """
-        Updates the neurons once
-        :return: Whether any neuron changed its state
-        """
-        ...
-
-
-class SynchronousUpdate:
-    """
-    Every neuron updates at the same time, based on the previous state of the network
-    """
-
-    def step(self, neurons: tuple[Neuron, ...], theta: float) -> bool:
-        # Compute all new states first, so no neuron sees a partially updated network
-        new_states = [neuron.next_state(theta) for neuron in neurons]
-        changed = False
-        for neuron, new_state in zip(neurons, new_states):
-            changed |= neuron.is_active != new_state
-            neuron.set_state(new_state)
-        return changed
-
-
-class AsynchronousUpdate:
-    """
-    Neurons update one at a time in a random order, each seeing the latest state of the network
-    """
-
-    def step(self, neurons: tuple[Neuron, ...], theta: float) -> bool:
-        order = list(neurons)
-        random.shuffle(order)
-        changed = False
-        for neuron in order:
-            changed |= neuron.update(theta)
-        return changed
-
 
 class HopfieldNetwork:
     """
@@ -128,16 +78,14 @@ class HopfieldNetwork:
     """
     MAX_STEPS = 100
 
-    def __init__(self, size: int, alpha: float, theta: float, update_rule: UpdateRule | None = None) -> None:
+    def __init__(self, size: int, alpha: float, theta: float) -> None:
         """
         :param size: Number of neurons
         :param alpha: Learning parameter between 0 and 1
         :param theta: Threshold a neuron's activation must reach to turn on
-        :param update_rule: How the neurons update, synchronously by default
         """
         self.alpha = alpha
         self.theta = theta
-        self._update_rule = update_rule if update_rule is not None else SynchronousUpdate()
         self._neurons = tuple(Neuron() for _ in range(size))
         self._connect_neurons()
 
@@ -184,9 +132,21 @@ class HopfieldNetwork:
         """
         self._present(pattern)
         for _ in range(self.MAX_STEPS):
-            if not self._update_rule.step(self._neurons, self._theta):
+            if not self._update():
                 return self.state  # Nothing changed, so S_n == S_n+1
         raise RuntimeError(f"No stable state reached within {self.MAX_STEPS} steps")
+
+    def _update(self) -> bool:
+        """
+        Updates all neurons at the same time (synchronously)
+        :return: Whether any neuron changed its state
+        """
+        # Compute all new states first, so no neuron sees a partially updated network
+        new_states = [neuron.next_state(self._theta) for neuron in self._neurons]
+        changed = new_states != [neuron.is_active for neuron in self._neurons]
+        for neuron, new_state in zip(self._neurons, new_states):
+            neuron.set_state(new_state)
+        return changed
 
     def _connect_neurons(self) -> None:
         for neuron in self._neurons:
@@ -222,15 +182,14 @@ def to_rows(pattern: Pattern, width: int) -> list[str]:
     return [" ".join(str(value) for value in pattern[i:i + width]) for i in range(0, len(pattern), width)]
 
 
-def run_demo(demo: Demo, update_rule: UpdateRule) -> None:
+def run_demo(demo: Demo) -> None:
     """
     Trains a network on the demo's patterns and tries to recover them from the damaged inputs
     :param demo: Demo to run
-    :param update_rule: How the neurons update
     """
-    network = HopfieldNetwork(len(demo.PATTERNS[0]), demo.ALPHA, demo.THETA, update_rule)
+    network = HopfieldNetwork(len(demo.PATTERNS[0]), demo.ALPHA, demo.THETA)
     network.train(demo.PATTERNS)
-    print(f"=== {type(update_rule).__name__} (alpha={network.alpha}, theta={network.theta}) ===\n")
+    print(f"Trained on {len(demo.PATTERNS)} patterns (alpha={network.alpha}, theta={network.theta})\n")
 
     for number, (damaged, expected) in enumerate(demo.TEST_CASES, start=1):
         recalled = network.recall(damaged)
@@ -245,5 +204,4 @@ def run_demo(demo: Demo, update_rule: UpdateRule) -> None:
 
 if __name__ == "__main__":
     demo = importlib.import_module(sys.argv[1] if len(sys.argv) > 1 else "demo")
-    run_demo(demo, SynchronousUpdate())
-    run_demo(demo, AsynchronousUpdate())
+    run_demo(demo)
