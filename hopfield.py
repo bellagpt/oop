@@ -195,12 +195,13 @@ def main() -> None:
         except RuntimeError as error:
             print(f"Test {number}: {error}\n")
             continue
-        print(f"Test {number}:", "recovered" if recalled == expected else "NOT recovered")
-        print("input".ljust(width * 2 + 3) + "output".ljust(width * 2 + 3) + "expected")
-        # Print the three patterns next to each other, one row of the grid at a time
+        result = "pattern recovered successfully" if recalled == expected else "pattern NOT recovered"
+        print(f"Test {number}: {result}")
+        print("input".ljust(width * 2 + 3) + "output")
+        # Print the input and output next to each other, one row of the grid at a time
         for start in range(0, len(damaged), width):
             print("    ".join(" ".join(map(str, pattern[start:start + width]))
-                             for pattern in (damaged, recalled, expected)))
+                             for pattern in (damaged, recalled)))
         print()
 
 
