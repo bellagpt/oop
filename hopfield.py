@@ -10,8 +10,6 @@ from __future__ import annotations
 import argparse
 import importlib
 
-Pattern = list[int]  # One value per neuron: 1 (on) or 0 (off)
-
 
 class Neuron:
     """
@@ -75,6 +73,7 @@ class HopfieldNetwork:
     """
     A fully connected network of neurons that learns patterns and recalls them from partial input
     """
+    Pattern = list[int]  # One value per neuron: 1 (on) or 0 (off)
     MAX_STEPS = 100
 
     def __init__(self, size: int, alpha: float, theta: float) -> None:
@@ -107,13 +106,13 @@ class HopfieldNetwork:
         self._theta = value
 
     @property
-    def state(self) -> Pattern:
+    def state(self) -> HopfieldNetwork.Pattern:
         """
         The current state of the network as a new list, so it cannot change the neurons
         """
         return [int(neuron.is_active) for neuron in self._neurons]
 
-    def train(self, patterns: list[Pattern]) -> None:
+    def train(self, patterns: list[HopfieldNetwork.Pattern]) -> None:
         """
         Presents the patterns one by one and lets every neuron learn from each of them
         :param patterns: Patterns to learn
@@ -123,7 +122,7 @@ class HopfieldNetwork:
             for neuron in self._neurons:
                 neuron.learn(self._alpha)
 
-    def recall(self, pattern: Pattern) -> Pattern:
+    def recall(self, pattern: HopfieldNetwork.Pattern) -> HopfieldNetwork.Pattern:
         """
         Presents a (partial) pattern and updates the neurons until a stable state is reached
         :param pattern: Pattern to start from
@@ -153,7 +152,7 @@ class HopfieldNetwork:
                 if other is not neuron:
                     neuron.connect_to(other)
 
-    def _present(self, pattern: Pattern) -> None:
+    def _present(self, pattern: HopfieldNetwork.Pattern) -> None:
         if len(pattern) != len(self):
             raise ValueError(f"A pattern must have {len(self)} values")
         for neuron, value in zip(self._neurons, pattern):
