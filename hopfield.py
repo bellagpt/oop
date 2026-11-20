@@ -137,6 +137,9 @@ class HopfieldNetwork:
         return changed
 
     def _connect_neurons(self) -> None:
+        """
+        Connects every neuron (self) to every other neuron (not self)
+        """
         for neuron in self._neurons:
             for other in self._neurons:
                 if other is not neuron:
