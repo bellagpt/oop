@@ -1,20 +1,13 @@
-"""
-Demo for the Hopfield network: two patterns on a 5x5 grid (25 neurons) and damaged versions of them.
 
-A pattern assigns the value 1 (on) or 0 (off) to every neuron. The lists below are
-written as 5 rows of 5 values only to make the shapes easy to see.
-
-Run it with ``python3 hopfield.py``. Another demo case can be used instead with
-``python3 hopfield.py --demo other_demo``, as long as it defines the same three names:
-GRID_WIDTH, PATTERNS and TEST_CASES.
 """
-"""
-File: hopfield.py
+File: demo.py
 Author: Isabella Ko (S6379338), Kaja Sledzinska (S6350992)
-Description: Hopfield network  
+Description: Demo for the Hopfield network. Has two test patterns and partial versions of those patterns. 
 """
 
-GRID_WIDTH = 5  # Only used to print the patterns as a grid
+GRID_WIDTH = 5  
+
+# The test patterns 
 
 SQUARE = [
     1, 1, 1, 1, 1,
@@ -32,10 +25,11 @@ BAR = [
     0, 0, 0, 0, 0,
 ]
 
-# The patterns the network learns
 PATTERNS = [SQUARE, BAR]
 
-# (damaged input, pattern that should come out)
+
+# partial patterns 
+
 TEST_CASES = [
     ([
         1, 1, 1, 0, 0,
