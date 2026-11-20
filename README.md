@@ -3,7 +3,11 @@
 An object oriented implementation of a Hopfield network, including a demo that
 recovers learned patterns in a network of 25 neurons (a 5x5 grid).
 
-All code is in a single file, `hopfield.py`; the unit tests are in `test_hopfield.py`.
+| File | Contents |
+|------|----------|
+| `hopfield.py` | The network (`Neuron`, `HopfieldNetwork`) and a generic `run_demo` that runs any demo |
+| `demo.py` | The demo data: two 5x5 patterns, damaged versions of them, and the values of α and θ |
+| `test_hopfield.py` | Unit tests |
 
 ## Requirements
 
@@ -21,6 +25,10 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt  # installs nothing, kept for completeness
 python hopfield.py               # inside the venv, `python` points to Python 3
 ```
+
+To run a different demo, create e.g. `my_demo.py` that defines `ALPHA`, `THETA`,
+`GRID_WIDTH`, `PATTERNS` and `TEST_CASES` (a list of `(description, damaged input, expected pattern)`),
+and run `python hopfield.py my_demo`.
 
 Without a venv, run `python3 hopfield.py` (Linux/macOS) or `py hopfield.py` (Windows).
 On Debian/Ubuntu, `python3 -m venv` may require `sudo apt install python3-venv` first.

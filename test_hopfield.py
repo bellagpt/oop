@@ -2,7 +2,8 @@
 
 import unittest
 
-from hopfield import BAR, SQUARE, HopfieldNetwork, Neuron, from_grid
+from demo import BAR, SQUARE, from_grid
+from hopfield import HopfieldNetwork, Neuron
 
 
 class NeuronTest(unittest.TestCase):

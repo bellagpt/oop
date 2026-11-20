@@ -1,13 +1,17 @@
-"""A Hopfield network in an object oriented way, with a demo on a 5x5 grid (25 neurons).
+"""A Hopfield network in an object oriented way.
 
-Run ``python3 hopfield.py`` to see the network recover learned patterns from damaged input.
+Run ``python3 hopfield.py`` to run the demo in demo.py, or ``python3 hopfield.py other_demo``
+to run another demo module (see run_demo for what such a module must define).
 
 A pattern is a list of 0/1 values, one per neuron (1 = on, 0 = off).
 """
 
 from __future__ import annotations
 
+import importlib
 import math
+import sys
+from types import ModuleType
 
 
 class Neuron:
@@ -128,82 +132,35 @@ class HopfieldNetwork:
             neuron.set_state(value == 1)
 
 
-# --- Demo -------------------------------------------------------------------------
+# --- Running a demo -----------------------------------------------------------------
 
-def from_grid(grid: str) -> list[int]:
-    """Turn a text grid of '#' (on) and '.' (off) into a pattern, ignoring whitespace."""
-    return [1 if symbol == "#" else 0 for symbol in grid if symbol in "#."]
-
-
-def to_grid(pattern: list[int], width: int = 5) -> list[str]:
+def to_grid(pattern: list[int], width: int) -> list[str]:
     """Turn a pattern into rows of '#' (on) and '.' (off)."""
     symbols = ["#" if value else "." for value in pattern]
     return [" ".join(symbols[i:i + width]) for i in range(0, len(symbols), width)]
 
 
-SQUARE = from_grid("""
-    # # # # #
-    # . . . #
-    # . . . #
-    # . . . #
-    # # # # #
-""")
+def run_demo(demo: ModuleType) -> None:
+    """Train a network on the demo's patterns and try to recover them from its damaged inputs.
 
-BAR = from_grid("""
-    . . . . .
-    # # # # #
-    # # # # #
-    # # # # #
-    . . . . .
-""")
+    The demo module must define ALPHA, THETA, GRID_WIDTH, PATTERNS and TEST_CASES,
+    where TEST_CASES is a list of (description, damaged input, expected pattern).
+    """
+    network = HopfieldNetwork(size=len(demo.PATTERNS[0]), alpha=demo.ALPHA, theta=demo.THETA)
+    network.train(*demo.PATTERNS)
+    print(f"Trained on {len(demo.PATTERNS)} patterns (alpha={network.alpha}, theta={network.theta})\n")
 
-# (description, damaged input, pattern that should come out)
-TEST_CASES = [
-    ("Square with half of the border missing", from_grid("""
-        # # # . .
-        # . . . .
-        # . . . .
-        # . . . .
-        # # # # #
-    """), SQUARE),
-    ("Square with three flipped neurons", from_grid("""
-        # # # # #
-        # . # . #
-        # . . . .
-        # . . . #
-        # # # . #
-    """), SQUARE),
-    ("Bar with its bottom row missing", from_grid("""
-        . . . . .
-        # # # # #
-        # # # # #
-        . . . . .
-        . . . . .
-    """), BAR),
-    ("Bar with holes and noise", from_grid("""
-        . # . . .
-        # . # # #
-        # # . # #
-        # # # . .
-        . . . . .
-    """), BAR),
-]
-
-
-def main() -> None:
-    """Train a network of 25 neurons on two patterns and recover them from damaged input."""
-    network = HopfieldNetwork(size=25, alpha=0.2, theta=1.75)
-    network.train(SQUARE, BAR)
-    print(f"Trained on a square and a bar (alpha={network.alpha}, theta={network.theta})\n")
-
-    for description, damaged, expected in TEST_CASES:
+    for description, damaged, expected in demo.TEST_CASES:
         recalled = network.recall(damaged)
         print(f"{description}: {'recovered' if recalled == expected else 'NOT recovered'}")
-        print("input        output       expected")
-        for row in zip(to_grid(damaged), to_grid(recalled), to_grid(expected)):
+        print("input".ljust(demo.GRID_WIDTH * 2 + 3) + "output".ljust(demo.GRID_WIDTH * 2 + 3) + "expected")
+        grids = (to_grid(pattern, demo.GRID_WIDTH) for pattern in (damaged, recalled, expected))
+        for row in zip(*grids):
             print("    ".join(row))
         print()
 
 
 if __name__ == "__main__":
-    main()
+    # Usage: python3 hopfield.py [demo_module]   (default: demo, i.e. demo.py)
+    demo_name = sys.argv[1] if len(sys.argv) > 1 else "demo"
+    run_demo(importlib.import_module(demo_name))
