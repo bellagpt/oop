@@ -130,10 +130,10 @@ class HopfieldNetwork:
         Updates all neurons at the same time (synchronously),
         Returns True if the network changed, and False otherwise
         """
-        new_states = [neuron.update(self._theta) for neuron in self._neurons]
+        new_states = [neuron.next_state(self._theta) for neuron in self._neurons]
         changed = new_states != [neuron.is_active for neuron in self._neurons]
-        for neuron, new_state in zip(self._neurons, new_states):
-            neuron.set_state(new_state)
+        for i in range(len(self._neurons)):
+            self._neurons[i].set_state(new_states[i])
         return changed
 
     def _connect_neurons(self) -> None:
